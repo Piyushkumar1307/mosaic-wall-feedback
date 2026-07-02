@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mosaic Feedback Wall
 
-## Getting Started
+A two-page feedback system inspired by live event kiosk displays:
 
-First, run the development server:
+- **`/`** — Submit feedback (dark kiosk-style page with textarea + Send button)
+- **`/wall`** — Live mosaic wall showing up to **30 feedback tiles** at once
+
+When the wall is full, new feedback replaces the oldest slot in a circular rotation (slot 1 gets replaced when the 31st item arrives, and so on). All feedback is stored in **Neon Postgres**.
+
+## Stack
+
+- Next.js 16 (App Router)
+- Neon Postgres + Drizzle ORM
+- Server-Sent Events for live wall updates
+
+## Setup
+
+1. **Install dependencies**
+
+```bash
+npm install
+```
+
+2. **Create a Neon database**
+
+- Go to [Neon Console](https://console.neon.tech)
+- Create a project and copy the connection string
+
+3. **Configure environment**
+
+```bash
+cp .env.example .env.local
+# Paste your Neon DATABASE_URL into .env.local
+```
+
+4. **Push the database schema**
+
+```bash
+npm run db:push
+```
+
+5. **Run the dev server**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Submit page: [http://localhost:3000](http://localhost:3000)
+- Wall display: [http://localhost:3000/wall](http://localhost:3000/wall)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How the wall works
 
-## Learn More
+- The wall is a **6×5 grid** (30 slots)
+- Submissions fill slots **1 → 30** in order
+- After 30 slots are filled, each new submission **replaces the oldest slot** (circular buffer)
+- The wall page listens for changes via **SSE** and highlights new/updated tiles
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run db:push` | Push schema to Neon |
+| `npm run db:studio` | Open Drizzle Studio |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy to [Vercel](https://vercel.com) and add `DATABASE_URL` as an environment variable. Run `npm run db:push` once against your production database before going live.
