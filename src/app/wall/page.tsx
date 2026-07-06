@@ -10,7 +10,7 @@ type WallItem = {
   createdAt: string;
 };
 
-const LEFT_EDGE_X = 2;
+const LEFT_EDGE_X = 0;
 const LEFT_EDGE_Y = 50;
 const CENTER_X = 50;
 const CENTER_Y = 50;
@@ -40,8 +40,6 @@ function WallDoodle({
   const toLeftEdgeY = `${LEFT_EDGE_Y - layout.posY}%`;
   const toCenterX = `${CENTER_X - layout.posX}%`;
   const toCenterY = `${CENTER_Y - layout.posY}%`;
-  const toSlotMidX = `${(CENTER_X - layout.posX) * 0.4}%`;
-  const toSlotMidY = `${(CENTER_Y - layout.posY) * 0.4}%`;
 
   return (
     <div
@@ -57,13 +55,11 @@ function WallDoodle({
         ["--to-left-edge-y" as string]: toLeftEdgeY,
         ["--to-center-x" as string]: toCenterX,
         ["--to-center-y" as string]: toCenterY,
-        ["--to-slot-mid-x" as string]: toSlotMidX,
-        ["--to-slot-mid-y" as string]: toSlotMidY,
       }}
       onAnimationEnd={(event) => {
         if (
           isEntering &&
-          event.animationName === "wall-float-enter-slot"
+          event.animationName === "wall-linear-enter-slot"
         ) {
           onEnterComplete(item.feedbackId);
         }
@@ -72,9 +68,7 @@ function WallDoodle({
       <img
         src={item.imageData}
         alt=""
-        className={`wall-doodle ${
-          isEntering ? "wall-doodle-enter" : "wall-doodle-float"
-        }`}
+        className={`wall-doodle ${isEntering ? "" : "wall-doodle-float"}`}
         style={{
           ["--rotation" as string]: `${layout.rotation}deg`,
           ["--scale" as string]: layout.scale,

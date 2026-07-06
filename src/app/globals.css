@@ -238,7 +238,7 @@ body,
 
 .wall-slot-enter {
   z-index: 20;
-  animation: wall-float-enter-slot 5.5s ease-in-out forwards;
+  animation: wall-linear-enter-slot 3.5s linear forwards;
 }
 
 .wall-doodle {
@@ -251,123 +251,36 @@ body,
   transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1));
 }
 
-.wall-doodle-enter {
-  animation: wall-doodle-float-in 5.5s ease-in-out forwards;
-}
-
 .wall-doodle-float {
   animation: wall-gentle-float var(--float-duration, 8s) ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
 }
 
-/* Left edge → center → glide into slot (slow floating path) */
-@keyframes wall-float-enter-slot {
+/* Linear: left edge (vertical center) → canvas center → slot. Constant size. */
+@keyframes wall-linear-enter-slot {
   0% {
-    transform: translate(
-      calc(-50% + var(--to-left-edge-x) - 14vw),
-      calc(-50% + var(--to-left-edge-y) + 8px)
-    );
-    width: min(24vw, 200px);
-    height: min(20vh, 175px);
-    opacity: 0;
-  }
-  8% {
-    opacity: 0.7;
-    transform: translate(
-      calc(-50% + var(--to-left-edge-x)),
-      calc(-50% + var(--to-left-edge-y) - 5px)
-    );
-  }
-  16% {
-    opacity: 1;
-    transform: translate(
-      calc(-50% + var(--to-left-edge-x)),
-      calc(-50% + var(--to-left-edge-y) + 4px)
-    );
-    width: min(26vw, 220px);
-    height: min(22vh, 190px);
-  }
-  24% {
-    transform: translate(
-      calc(-50% + var(--to-left-edge-x)),
-      calc(-50% + var(--to-left-edge-y) - 3px)
-    );
-  }
-  32% {
     transform: translate(
       calc(-50% + var(--to-left-edge-x)),
       calc(-50% + var(--to-left-edge-y))
     );
+    width: var(--slot-w);
+    height: var(--slot-h);
+    opacity: 1;
   }
-  50% {
+  42% {
     transform: translate(
       calc(-50% + var(--to-center-x)),
-      calc(-50% + var(--to-center-y) + 6px)
-    );
-    width: min(32vw, 280px);
-    height: min(28vh, 240px);
-  }
-  60% {
-    transform: translate(
-      calc(-50% + var(--to-center-x)),
-      calc(-50% + var(--to-center-y) - 4px)
-    );
-    width: min(34vw, 300px);
-    height: min(30vh, 260px);
-  }
-  70% {
-    transform: translate(
-      calc(-50% + var(--to-center-x)),
-      calc(-50% + var(--to-center-y) + 2px)
-    );
-  }
-  82% {
-    transform: translate(
-      calc(-50% + var(--to-slot-mid-x)),
-      calc(-50% + var(--to-slot-mid-y) - 2px)
+      calc(-50% + var(--to-center-y))
     );
     width: var(--slot-w);
     height: var(--slot-h);
-  }
-  92% {
-    transform: translate(-50%, calc(-50% + 3px));
+    opacity: 1;
   }
   100% {
     transform: translate(-50%, -50%);
     width: var(--slot-w);
     height: var(--slot-h);
     opacity: 1;
-  }
-}
-
-@keyframes wall-doodle-float-in {
-  0% {
-    opacity: 0;
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.82))
-      translateY(10px);
-  }
-  15% {
-    opacity: 0.7;
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.9))
-      translateY(-5px);
-  }
-  35% {
-    opacity: 1;
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.96))
-      translateY(4px);
-  }
-  55% {
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 1.02))
-      translateY(-4px);
-  }
-  75% {
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.98))
-      translateY(3px);
-  }
-  100% {
-    opacity: 1;
-    transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1))
-      translateY(0);
   }
 }
 
