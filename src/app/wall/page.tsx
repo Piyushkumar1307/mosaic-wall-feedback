@@ -7,15 +7,13 @@ type WallItem = {
   slotIndex: number;
   feedbackId: number;
   imageData: string;
-  posX: number;
-  posY: number;
-  rotation: number;
-  scale: number;
   createdAt: string;
 };
 
+const CENTER_LEFT_X = 22;
+const CENTER_LEFT_Y = 44;
 const CENTER_X = 50;
-const CENTER_Y = 38;
+const CENTER_Y = 40;
 
 function isValidImageData(value: string) {
   return value.startsWith("data:image/");
@@ -38,8 +36,12 @@ function WallDoodle({
 }: WallDoodleProps) {
   const layout = getSlotLayout(item.slotIndex, itemCount);
 
+  const toCenterLeftX = `${CENTER_LEFT_X - layout.posX}%`;
+  const toCenterLeftY = `${CENTER_LEFT_Y - layout.posY}%`;
   const toCenterX = `${CENTER_X - layout.posX}%`;
   const toCenterY = `${CENTER_Y - layout.posY}%`;
+  const toSlotMidX = `${(CENTER_X - layout.posX) * 0.35}%`;
+  const toSlotMidY = `${(CENTER_Y - layout.posY) * 0.35}%`;
 
   return (
     <div
@@ -51,13 +53,17 @@ function WallDoodle({
         height: `${layout.slotHeightPct}%`,
         ["--slot-w" as string]: `${layout.slotWidthPct}%`,
         ["--slot-h" as string]: `${layout.slotHeightPct}%`,
+        ["--to-center-left-x" as string]: toCenterLeftX,
+        ["--to-center-left-y" as string]: toCenterLeftY,
         ["--to-center-x" as string]: toCenterX,
         ["--to-center-y" as string]: toCenterY,
+        ["--to-slot-mid-x" as string]: toSlotMidX,
+        ["--to-slot-mid-y" as string]: toSlotMidY,
       }}
       onAnimationEnd={(event) => {
         if (
           isEntering &&
-          event.animationName === "wall-left-center-slot"
+          event.animationName === "wall-float-enter-slot"
         ) {
           onEnterComplete(item.feedbackId);
         }
@@ -72,7 +78,7 @@ function WallDoodle({
         style={{
           ["--rotation" as string]: `${layout.rotation}deg`,
           ["--scale" as string]: layout.scale,
-          ["--float-duration" as string]: `${5.5 + (item.feedbackId % 4)}s`,
+          ["--float-duration" as string]: `${7.5 + (item.feedbackId % 4)}s`,
           ["--float-delay" as string]: `${(item.feedbackId % 6) * 0.25}s`,
         }}
         draggable={false}

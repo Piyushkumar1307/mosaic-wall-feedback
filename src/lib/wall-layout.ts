@@ -48,14 +48,3 @@ export function getSlotLayout(
     scale: densityScale(safeCount),
   };
 }
-
-export function getSlotPlacement(slotIndex: number, itemCount: number) {
-  const layout = getSlotLayout(slotIndex, itemCount);
-
-  return {
-    posX: layout.posX,
-    posY: layout.posY,
-    rotation: layout.rotation,
-    scale: layout.scale,
-  };
-}
