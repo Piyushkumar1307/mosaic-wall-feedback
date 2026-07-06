@@ -15,7 +15,7 @@ type WallItem = {
 };
 
 const CENTER_X = 50;
-const CENTER_Y = 50;
+const CENTER_Y = 38;
 
 function isValidImageData(value: string) {
   return value.startsWith("data:image/");
@@ -169,6 +169,7 @@ export default function WallPage() {
 
   return (
     <main className="wall-shell">
+      <h1 className="wall-title">Feedback Wall</h1>
       <section className="wall-canvas" aria-label="Floating feedback doodles">
         {visibleItems.map((item) => (
           <WallDoodle
