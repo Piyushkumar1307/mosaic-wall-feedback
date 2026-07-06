@@ -3,9 +3,9 @@ import { WALL_SIZE } from "@/lib/constants";
 const COLS = 5;
 const ROWS = 6;
 const PAD_X = 3;
-const PAD_Y = 2;
+const PAD_Y = 8;
 const GAP = 0.8;
-const VERTICAL_SHIFT = -5;
+const VERTICAL_SHIFT = 0;
 
 export type SlotLayout = {
   posX: number;

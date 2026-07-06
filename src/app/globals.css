@@ -338,7 +338,7 @@ body,
   }
   50% {
     transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1))
-      translateY(-7px);
+      translateY(-4px);
   }
 }
 
