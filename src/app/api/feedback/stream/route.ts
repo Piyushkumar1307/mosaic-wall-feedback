@@ -1,4 +1,4 @@
-import { getWallItems } from "@/lib/wall";
+import { subscribe } from "@/lib/wall-store";
 
 export const dynamic = "force-dynamic";
 
@@ -6,37 +6,21 @@ export async function GET(request: Request) {
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
-    async start(controller) {
-      let lastPayload = "";
-      let closed = false;
-
-      const push = async () => {
-        if (closed) return;
-
-        try {
-          const items = await getWallItems();
-          const payload = JSON.stringify({ items });
-
-          if (payload !== lastPayload) {
-            lastPayload = payload;
-            controller.enqueue(encoder.encode(`data: ${payload}\n\n`));
-          }
-        } catch (error) {
-          console.error("SSE poll error:", error);
-        }
+    start(controller) {
+      const push = (items: unknown) => {
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ items })}\n\n`),
+        );
       };
 
-      await push();
-      const interval = setInterval(push, 300);
+      const unsubscribe = subscribe(push);
+
       const keepAlive = setInterval(() => {
-        if (!closed) {
-          controller.enqueue(encoder.encode(": keepalive\n\n"));
-        }
+        controller.enqueue(encoder.encode(": keepalive\n\n"));
       }, 15000);
 
       request.signal.addEventListener("abort", () => {
-        closed = true;
-        clearInterval(interval);
+        unsubscribe();
         clearInterval(keepAlive);
         controller.close();
       });

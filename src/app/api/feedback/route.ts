@@ -1,19 +1,12 @@
 import { NextResponse } from "next/server";
-import { getWallItems, submitFeedback } from "@/lib/wall";
+import { getWallItems, submitFeedback } from "@/lib/wall-store";
 
 const MAX_IMAGE_BYTES = 2_000_000;
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  try {
-    const items = await getWallItems();
-    return NextResponse.json({ items });
-  } catch (error) {
-    console.error("Failed to fetch wall:", error);
-    return NextResponse.json(
-      { error: "Failed to load feedback wall" },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({ items: getWallItems() });
 }
 
 export async function POST(request: Request) {
@@ -46,10 +39,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const item = await submitFeedback(imageData);
-    const items = await getWallItems();
+    const item = submitFeedback(imageData);
 
-    return NextResponse.json({ item, items }, { status: 201 });
+    return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
     console.error("Failed to submit feedback:", error);
     return NextResponse.json(
