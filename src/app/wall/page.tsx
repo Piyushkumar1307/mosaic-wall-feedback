@@ -10,10 +10,10 @@ type WallItem = {
   createdAt: string;
 };
 
-const CENTER_LEFT_X = 22;
-const CENTER_LEFT_Y = 44;
+const LEFT_EDGE_X = 2;
+const LEFT_EDGE_Y = 50;
 const CENTER_X = 50;
-const CENTER_Y = 40;
+const CENTER_Y = 50;
 
 function isValidImageData(value: string) {
   return value.startsWith("data:image/");
@@ -36,12 +36,12 @@ function WallDoodle({
 }: WallDoodleProps) {
   const layout = getSlotLayout(item.slotIndex, itemCount);
 
-  const toCenterLeftX = `${CENTER_LEFT_X - layout.posX}%`;
-  const toCenterLeftY = `${CENTER_LEFT_Y - layout.posY}%`;
+  const toLeftEdgeX = `${LEFT_EDGE_X - layout.posX}%`;
+  const toLeftEdgeY = `${LEFT_EDGE_Y - layout.posY}%`;
   const toCenterX = `${CENTER_X - layout.posX}%`;
   const toCenterY = `${CENTER_Y - layout.posY}%`;
-  const toSlotMidX = `${(CENTER_X - layout.posX) * 0.35}%`;
-  const toSlotMidY = `${(CENTER_Y - layout.posY) * 0.35}%`;
+  const toSlotMidX = `${(CENTER_X - layout.posX) * 0.4}%`;
+  const toSlotMidY = `${(CENTER_Y - layout.posY) * 0.4}%`;
 
   return (
     <div
@@ -53,8 +53,8 @@ function WallDoodle({
         height: `${layout.slotHeightPct}%`,
         ["--slot-w" as string]: `${layout.slotWidthPct}%`,
         ["--slot-h" as string]: `${layout.slotHeightPct}%`,
-        ["--to-center-left-x" as string]: toCenterLeftX,
-        ["--to-center-left-y" as string]: toCenterLeftY,
+        ["--to-left-edge-x" as string]: toLeftEdgeX,
+        ["--to-left-edge-y" as string]: toLeftEdgeY,
         ["--to-center-x" as string]: toCenterX,
         ["--to-center-y" as string]: toCenterY,
         ["--to-slot-mid-x" as string]: toSlotMidX,
@@ -93,7 +93,7 @@ export default function WallPage() {
   const [enteringIds, setEnteringIds] = useState<Set<number>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
   const itemsRef = useRef<WallItem[]>([]);
-  const isFirstLoadRef = useRef(true);
+  const initialFetchDoneRef = useRef(false);
 
   const handleEnterComplete = useCallback((id: number) => {
     setEnteringIds((current) => {
@@ -108,39 +108,33 @@ export default function WallPage() {
     setHiddenIds((current) => new Set(current).add(id));
   }, []);
 
-  const applyItems = useCallback((incoming: WallItem[]) => {
-    const validItems = incoming.filter((item) => isValidImageData(item.imageData));
-    const previousIds = new Set(itemsRef.current.map((item) => item.feedbackId));
-    const addedIds = validItems
-      .filter((item) => !previousIds.has(item.feedbackId))
-      .map((item) => item.feedbackId);
+  const applyItems = useCallback(
+    (incoming: WallItem[], options?: { fromInitialFetch?: boolean }) => {
+      const validItems = incoming.filter((item) =>
+        isValidImageData(item.imageData),
+      );
+      const previousIds = new Set(
+        itemsRef.current.map((item) => item.feedbackId),
+      );
+      const addedIds = validItems
+        .filter((item) => !previousIds.has(item.feedbackId))
+        .map((item) => item.feedbackId);
 
-    const isInitialHydration =
-      itemsRef.current.length === 0 &&
-      validItems.length > 0 &&
-      isFirstLoadRef.current;
+      if (options?.fromInitialFetch) {
+        // Existing doodles on page load — show without entry animation.
+      } else if (addedIds.length > 0 && initialFetchDoneRef.current) {
+        setEnteringIds((current) => new Set([...current, ...addedIds]));
+      }
 
-    if (isInitialHydration) {
-      isFirstLoadRef.current = false;
-    } else if (addedIds.length > 0) {
-      setEnteringIds((current) => new Set([...current, ...addedIds]));
-    }
-
-    itemsRef.current = validItems;
-    setItems(validItems);
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/feedback")
-      .then((response) => response.json())
-      .then((data: { items: WallItem[] }) => applyItems(data.items))
-      .catch(() => {
-        // ignore initial fetch errors; SSE will retry
-      });
-  }, [applyItems]);
+      itemsRef.current = validItems;
+      setItems(validItems);
+    },
+    [],
+  );
 
   useEffect(() => {
     let source: EventSource | null = null;
+    let cancelled = false;
 
     const connect = () => {
       source = new EventSource("/api/feedback/stream");
@@ -155,13 +149,28 @@ export default function WallPage() {
       };
       source.onerror = () => {
         source?.close();
-        window.setTimeout(connect, 1000);
+        window.setTimeout(() => {
+          if (!cancelled) connect();
+        }, 1000);
       };
     };
 
-    connect();
+    fetch("/api/feedback")
+      .then((response) => response.json())
+      .then((data: { items: WallItem[] }) =>
+        applyItems(data.items, { fromInitialFetch: true }),
+      )
+      .catch(() => {
+        // ignore initial fetch errors; SSE will still connect
+      })
+      .finally(() => {
+        if (cancelled) return;
+        initialFetchDoneRef.current = true;
+        connect();
+      });
 
     return () => {
+      cancelled = true;
       source?.close();
     };
   }, [applyItems]);

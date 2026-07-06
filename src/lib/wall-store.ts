@@ -28,7 +28,6 @@ export function getWallItems(): WallItem[] {
 
 export function subscribe(listener: WallListener) {
   listeners.add(listener);
-  listener(getWallItems());
 
   return () => {
     listeners.delete(listener);
