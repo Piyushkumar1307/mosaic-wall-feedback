@@ -256,30 +256,24 @@ body,
   animation-delay: var(--float-delay, 0s);
 }
 
-/* Linear: left edge (vertical center) → canvas center → slot. Constant size. */
+/* Linear: canvas left edge → canvas center → slot. Uses left/top (% of canvas). */
 @keyframes wall-linear-enter-slot {
   0% {
-    transform: translate(
-      calc(-50% + var(--to-left-edge-x)),
-      calc(-50% + var(--to-left-edge-y))
-    );
-    width: var(--slot-w);
-    height: var(--slot-h);
+    left: 0%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
   42% {
-    transform: translate(
-      calc(-50% + var(--to-center-x)),
-      calc(-50% + var(--to-center-y))
-    );
-    width: var(--slot-w);
-    height: var(--slot-h);
+    left: var(--center-left);
+    top: var(--center-top);
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
   100% {
+    left: var(--final-left);
+    top: var(--final-top);
     transform: translate(-50%, -50%);
-    width: var(--slot-w);
-    height: var(--slot-h);
     opacity: 1;
   }
 }

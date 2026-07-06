@@ -10,8 +10,6 @@ type WallItem = {
   createdAt: string;
 };
 
-const LEFT_EDGE_X = 0;
-const LEFT_EDGE_Y = 50;
 const CENTER_X = 50;
 const CENTER_Y = 50;
 
@@ -36,11 +34,6 @@ function WallDoodle({
 }: WallDoodleProps) {
   const layout = getSlotLayout(item.slotIndex, itemCount);
 
-  const toLeftEdgeX = `${LEFT_EDGE_X - layout.posX}%`;
-  const toLeftEdgeY = `${LEFT_EDGE_Y - layout.posY}%`;
-  const toCenterX = `${CENTER_X - layout.posX}%`;
-  const toCenterY = `${CENTER_Y - layout.posY}%`;
-
   return (
     <div
       className={`wall-slot ${isEntering ? "wall-slot-enter" : ""}`}
@@ -49,12 +42,10 @@ function WallDoodle({
         top: `${layout.posY}%`,
         width: `${layout.slotWidthPct}%`,
         height: `${layout.slotHeightPct}%`,
-        ["--slot-w" as string]: `${layout.slotWidthPct}%`,
-        ["--slot-h" as string]: `${layout.slotHeightPct}%`,
-        ["--to-left-edge-x" as string]: toLeftEdgeX,
-        ["--to-left-edge-y" as string]: toLeftEdgeY,
-        ["--to-center-x" as string]: toCenterX,
-        ["--to-center-y" as string]: toCenterY,
+        ["--final-left" as string]: `${layout.posX}%`,
+        ["--final-top" as string]: `${layout.posY}%`,
+        ["--center-left" as string]: `${CENTER_X}%`,
+        ["--center-top" as string]: `${CENTER_Y}%`,
       }}
       onAnimationEnd={(event) => {
         if (
