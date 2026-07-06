@@ -129,64 +129,7 @@ body,
 
 .submit-controls {
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.75rem, 2vw, 1rem);
   margin-top: clamp(0.75rem, 2vw, 1rem);
-}
-
-.thickness-picker {
-  margin: 0;
-  padding: 0;
-  border: none;
-  min-inline-size: 0;
-}
-
-.thickness-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.thickness-options {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(0.5rem, 1.5vw, 0.75rem);
-}
-
-.thickness-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  min-height: var(--touch-min);
-  padding: 0.65rem 0.5rem;
-  border: 2px solid var(--panel-border);
-  border-radius: 0.85rem;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--paper);
-  font-weight: 600;
-  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.thickness-option.active {
-  border-color: var(--accent);
-  background: rgba(110, 231, 168, 0.12);
-  color: var(--accent);
-}
-
-.thickness-dot {
-  border-radius: 999px;
-  background: currentColor;
-  min-width: 8px;
-  min-height: 8px;
 }
 
 .submit-footer {
@@ -280,14 +223,12 @@ body,
 
 .wall-slot-enter {
   z-index: 20;
-  animation: wall-travel-to-slot 2.4s cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
+  animation: wall-left-center-slot 2.2s cubic-bezier(0.42, 0, 0.2, 1) forwards;
 }
 
 .wall-doodle {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   user-select: none;
   filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.1));
@@ -296,7 +237,7 @@ body,
 }
 
 .wall-doodle-enter {
-  animation: wall-center-zoom 1.45s cubic-bezier(0.34, 1.15, 0.64, 1) forwards;
+  animation: wall-center-zoom 1.35s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
 }
 
 .wall-doodle-float {
@@ -304,39 +245,57 @@ body,
   animation-delay: var(--float-delay, 0s);
 }
 
-/* Phase 1: hold at screen center. Phase 2: glide to assigned slot. */
-@keyframes wall-travel-to-slot {
-  0%,
+/* Left off-screen → center (zoom) → glide into slot */
+@keyframes wall-left-center-slot {
+  0% {
+    transform: translate(calc(-50% - 52vw), calc(-50% + var(--to-center-y)));
+    width: min(30vw, 260px);
+    height: min(26vh, 220px);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  14% {
+    transform: translate(calc(-50% - 52vw), calc(-50% + var(--to-center-y)));
+    width: min(34vw, 300px);
+    height: min(30vh, 260px);
+  }
+  44% {
+    transform: translate(calc(-50% + var(--to-center-x)), calc(-50% + var(--to-center-y)));
+    width: min(42vw, 360px);
+    height: min(38vh, 320px);
+  }
   58% {
-    transform: translate(calc(-50% + var(--travel-x)), calc(-50% + var(--travel-y)));
-    width: min(38vw, 320px);
-    height: min(34vh, 280px);
+    transform: translate(calc(-50% + var(--to-center-x)), calc(-50% + var(--to-center-y)));
+    width: min(42vw, 360px);
+    height: min(38vh, 320px);
   }
   100% {
     transform: translate(-50%, -50%);
     width: var(--slot-w);
     height: var(--slot-h);
+    opacity: 1;
   }
 }
 
-/* Zoom in → zoom out at center, settle to final scale before travel ends */
 @keyframes wall-center-zoom {
   0% {
     opacity: 0;
-    transform: rotate(var(--rotation, 0deg)) scale(0.1);
+    transform: rotate(var(--rotation, 0deg)) scale(0.12);
   }
-  28% {
+  22% {
     opacity: 1;
-    transform: rotate(var(--rotation, 0deg)) scale(1.22);
+    transform: rotate(var(--rotation, 0deg)) scale(1.2);
   }
-  46% {
-    transform: rotate(var(--rotation, 0deg)) scale(0.88);
+  38% {
+    transform: rotate(var(--rotation, 0deg)) scale(0.9);
   }
-  58% {
-    transform: rotate(var(--rotation, 0deg)) scale(1.1);
+  50% {
+    transform: rotate(var(--rotation, 0deg)) scale(1.08);
   }
-  72% {
-    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.96));
+  62% {
+    transform: rotate(var(--rotation, 0deg)) scale(calc(var(--scale, 1) * 0.97));
   }
   100% {
     opacity: 1;
@@ -378,10 +337,6 @@ body,
   .submit-panel {
     padding: 0.75rem;
   }
-
-  .thickness-options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* Tablet */
@@ -399,10 +354,6 @@ body,
 
   .submit-form {
     max-width: 1100px;
-  }
-
-  .thickness-option {
-    min-height: 56px;
   }
 
   .submit-clear-button,

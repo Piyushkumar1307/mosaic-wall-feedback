@@ -3,18 +3,8 @@
 import { FormEvent, useRef, useState } from "react";
 import DoodleCanvas, { type DoodleCanvasHandle } from "@/components/DoodleCanvas";
 
-const THICKNESS_OPTIONS = [
-  { label: "Thin", value: 3 },
-  { label: "Medium", value: 6 },
-  { label: "Thick", value: 12 },
-  { label: "Bold", value: 20 },
-] as const;
-
 export default function SubmitPage() {
   const canvasRef = useRef<DoodleCanvasHandle>(null);
-  const [strokeWidth, setStrokeWidth] = useState<number>(
-    THICKNESS_OPTIONS[1].value,
-  );
   const [hasDrawing, setHasDrawing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
@@ -49,8 +39,9 @@ export default function SubmitPage() {
       }
 
       canvasRef.current?.clear();
+      setHasDrawing(false);
       setStatus("sent");
-      setTimeout(() => setStatus("idle"), 2500);
+      setTimeout(() => setStatus("idle"), 1500);
     } catch (error) {
       setStatus("error");
       setErrorMessage(
@@ -71,37 +62,9 @@ export default function SubmitPage() {
         </header>
 
         <form onSubmit={handleSubmit} className="submit-form">
-          <DoodleCanvas
-            ref={canvasRef}
-            strokeWidth={strokeWidth}
-            onDrawingChange={setHasDrawing}
-          />
+          <DoodleCanvas ref={canvasRef} onDrawingChange={setHasDrawing} />
 
           <div className="submit-controls">
-            <fieldset className="thickness-picker">
-              <legend className="thickness-label">Thickness</legend>
-              <div className="thickness-options">
-                {THICKNESS_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className={`thickness-option ${
-                      strokeWidth === option.value ? "active" : ""
-                    }`}
-                    onClick={() => setStrokeWidth(option.value)}
-                    aria-pressed={strokeWidth === option.value}
-                  >
-                    <span
-                      className="thickness-dot"
-                      style={{ height: option.value, width: option.value }}
-                      aria-hidden
-                    />
-                    <span>{option.label}</span>
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
             <div className="submit-footer">
               <button
                 type="button"

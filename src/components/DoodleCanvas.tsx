@@ -9,7 +9,7 @@ import {
 } from "react";
 
 const STROKE_COLOR = "#15803d";
-const DEFAULT_STROKE_WIDTH = 5;
+const STROKE_WIDTH = 6;
 
 export type DoodleCanvasHandle = {
   clear: () => void;
@@ -18,9 +18,56 @@ export type DoodleCanvasHandle = {
 };
 
 type DoodleCanvasProps = {
-  strokeWidth?: number;
   onDrawingChange?: (hasDrawing: boolean) => void;
 };
+
+function cropCanvasToDataUrl(canvas: HTMLCanvasElement): string | null {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const { width, height } = canvas;
+  const pixels = ctx.getImageData(0, 0, width, height).data;
+
+  let minX = width;
+  let minY = height;
+  let maxX = 0;
+  let maxY = 0;
+  let found = false;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const alpha = pixels[(y * width + x) * 4 + 3];
+      if (alpha > 0) {
+        found = true;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (!found) return null;
+
+  const padding = Math.round(STROKE_WIDTH * 3 * (window.devicePixelRatio || 1));
+  minX = Math.max(0, minX - padding);
+  minY = Math.max(0, minY - padding);
+  maxX = Math.min(width - 1, maxX + padding);
+  maxY = Math.min(height - 1, maxY + padding);
+
+  const cropW = maxX - minX + 1;
+  const cropH = maxY - minY + 1;
+
+  const cropped = document.createElement("canvas");
+  cropped.width = cropW;
+  cropped.height = cropH;
+
+  const cropCtx = cropped.getContext("2d");
+  if (!cropCtx) return null;
+
+  cropCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+  return cropped.toDataURL("image/png");
+}
 
 function getPoint(
   canvas: HTMLCanvasElement,
@@ -35,10 +82,7 @@ function getPoint(
 }
 
 const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
-  function DoodleCanvas(
-    { strokeWidth = DEFAULT_STROKE_WIDTH, onDrawingChange },
-    ref,
-  ) {
+  function DoodleCanvas({ onDrawingChange }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const drawingRef = useRef(false);
@@ -46,9 +90,9 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
     const activePointerRef = useRef<number | null>(null);
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     const sizeRef = useRef({ width: 0, height: 0, ratio: 1 });
-    const strokeWidthRef = useRef(strokeWidth);
+    const strokeWidthRef = useRef(STROKE_WIDTH);
 
-    strokeWidthRef.current = strokeWidth;
+    strokeWidthRef.current = STROKE_WIDTH;
 
     const notifyChange = useCallback(
       (hasDrawing: boolean) => {
@@ -110,7 +154,7 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
       if (ctx) {
         applyStrokeStyle(ctx);
       }
-    }, [strokeWidth, applyStrokeStyle]);
+    }, [applyStrokeStyle]);
 
     const markDrawn = useCallback(() => {
       if (!hasDrawnRef.current) {
@@ -215,7 +259,7 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
       toDataUrl: () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasDrawnRef.current) return null;
-        return canvas.toDataURL("image/png");
+        return cropCanvasToDataUrl(canvas);
       },
     }));
 

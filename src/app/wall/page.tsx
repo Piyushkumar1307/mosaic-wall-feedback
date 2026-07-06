@@ -14,7 +14,8 @@ type WallItem = {
   createdAt: string;
 };
 
-const ENTER_ANIMATION_MS = 2400;
+const CENTER_X = 50;
+const CENTER_Y = 50;
 
 function isValidImageData(value: string) {
   return value.startsWith("data:image/");
@@ -37,18 +38,8 @@ function WallDoodle({
 }: WallDoodleProps) {
   const layout = getSlotLayout(item.slotIndex, itemCount);
 
-  useEffect(() => {
-    if (!isEntering) return;
-
-    const timer = window.setTimeout(() => {
-      onEnterComplete(item.feedbackId);
-    }, ENTER_ANIMATION_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [isEntering, item.feedbackId, onEnterComplete]);
-
-  const travelX = `${50 - layout.posX}%`;
-  const travelY = `${50 - layout.posY}%`;
+  const toCenterX = `${CENTER_X - layout.posX}%`;
+  const toCenterY = `${CENTER_Y - layout.posY}%`;
 
   return (
     <div
@@ -60,8 +51,16 @@ function WallDoodle({
         height: `${layout.slotHeightPct}%`,
         ["--slot-w" as string]: `${layout.slotWidthPct}%`,
         ["--slot-h" as string]: `${layout.slotHeightPct}%`,
-        ["--travel-x" as string]: travelX,
-        ["--travel-y" as string]: travelY,
+        ["--to-center-x" as string]: toCenterX,
+        ["--to-center-y" as string]: toCenterY,
+      }}
+      onAnimationEnd={(event) => {
+        if (
+          isEntering &&
+          event.animationName === "wall-left-center-slot"
+        ) {
+          onEnterComplete(item.feedbackId);
+        }
       }}
     >
       <img
@@ -87,10 +86,12 @@ export default function WallPage() {
   const [items, setItems] = useState<WallItem[]>([]);
   const [enteringIds, setEnteringIds] = useState<Set<number>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
+  const itemsRef = useRef<WallItem[]>([]);
   const isFirstLoadRef = useRef(true);
 
   const handleEnterComplete = useCallback((id: number) => {
     setEnteringIds((current) => {
+      if (!current.has(id)) return current;
       const next = new Set(current);
       next.delete(id);
       return next;
@@ -103,22 +104,34 @@ export default function WallPage() {
 
   const applyItems = useCallback((incoming: WallItem[]) => {
     const validItems = incoming.filter((item) => isValidImageData(item.imageData));
+    const previousIds = new Set(itemsRef.current.map((item) => item.feedbackId));
+    const addedIds = validItems
+      .filter((item) => !previousIds.has(item.feedbackId))
+      .map((item) => item.feedbackId);
 
-    setItems((previous) => {
-      const previousIds = new Set(previous.map((item) => item.feedbackId));
-      const addedIds = validItems
-        .filter((item) => !previousIds.has(item.feedbackId))
-        .map((item) => item.feedbackId);
+    const isInitialHydration =
+      itemsRef.current.length === 0 &&
+      validItems.length > 0 &&
+      isFirstLoadRef.current;
 
-      if (previous.length === 0 && validItems.length > 0 && isFirstLoadRef.current) {
-        isFirstLoadRef.current = false;
-      } else if (addedIds.length > 0) {
-        setEnteringIds((current) => new Set([...current, ...addedIds]));
-      }
+    if (isInitialHydration) {
+      isFirstLoadRef.current = false;
+    } else if (addedIds.length > 0) {
+      setEnteringIds((current) => new Set([...current, ...addedIds]));
+    }
 
-      return validItems;
-    });
+    itemsRef.current = validItems;
+    setItems(validItems);
   }, []);
+
+  useEffect(() => {
+    fetch("/api/feedback")
+      .then((response) => response.json())
+      .then((data: { items: WallItem[] }) => applyItems(data.items))
+      .catch(() => {
+        // ignore initial fetch errors; SSE will retry
+      });
+  }, [applyItems]);
 
   useEffect(() => {
     let source: EventSource | null = null;
@@ -136,7 +149,7 @@ export default function WallPage() {
       };
       source.onerror = () => {
         source?.close();
-        window.setTimeout(connect, 3000);
+        window.setTimeout(connect, 1000);
       };
     };
 

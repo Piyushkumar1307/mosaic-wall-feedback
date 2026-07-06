@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       };
 
       await push();
-      const interval = setInterval(push, 2000);
+      const interval = setInterval(push, 300);
       const keepAlive = setInterval(() => {
         if (!closed) {
           controller.enqueue(encoder.encode(": keepalive\n\n"));
