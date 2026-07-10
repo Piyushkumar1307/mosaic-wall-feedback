@@ -213,7 +213,7 @@ body,
   align-items: center;
   justify-content: space-between;
   gap: clamp(0.75rem, 2vw, 1.5rem);
-  padding: 3px clamp(1rem, 2.5vw, 1.75rem) clamp(0.5rem, 1.2vh, 0.85rem);
+  padding: 3px clamp(0.85rem, 2vw, 1.5rem) clamp(0.4rem, 0.9vh, 0.65rem);
 }
 
 .wall-logo {
@@ -224,13 +224,13 @@ body,
 }
 
 .wall-logo-left {
-  height: clamp(64px, 11vh, 96px);
-  max-width: min(44vw, 400px);
+  height: clamp(104px, 15vh, 140px);
+  max-width: min(50vw, 560px);
 }
 
 .wall-logo-right {
-  height: clamp(112px, 19vh, 168px);
-  max-width: min(48vw, 360px);
+  height: clamp(112px, 16vh, 148px);
+  max-width: min(36vw, 320px);
 }
 
 .wall-canvas {
@@ -239,7 +239,6 @@ body,
   min-height: 0;
   width: 100%;
   overflow: hidden;
-  padding-top: clamp(0.35rem, 1vh, 0.75rem);
 }
 
 .wall-slot {
