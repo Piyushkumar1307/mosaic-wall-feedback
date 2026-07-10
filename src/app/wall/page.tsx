@@ -176,13 +176,13 @@ export default function WallPage() {
 
   return (
     <main className="wall-shell">
-      <header className="wall-header">
+      <header className="wall-header" aria-label="Feedback Wall">
         <img
           src="/protocol-logo.png"
           alt="Department of Textiles, Government of Maharashtra"
           className="wall-logo"
         />
-        <h1 className="wall-title">Feedback Wall</h1>
+        <h1 className="sr-only">Feedback Wall</h1>
       </header>
       <section className="wall-canvas" aria-label="Floating feedback doodles">
         {visibleItems.map((item) => (

@@ -3,9 +3,9 @@ import { WALL_SIZE } from "@/lib/constants";
 const COLS = 5;
 const ROWS = 6;
 const PAD_X = 3;
-const PAD_Y = 8;
+const PAD_TOP = 12;
+const PAD_BOTTOM = 5;
 const GAP = 0.8;
-const VERTICAL_SHIFT = 0;
 
 export type SlotLayout = {
   posX: number;
@@ -33,11 +33,10 @@ export function getSlotLayout(
   const row = Math.floor(slotIndex / COLS);
 
   const cellW = (100 - PAD_X * 2 - GAP * (COLS - 1)) / COLS;
-  const cellH = (100 - PAD_Y * 2 - GAP * (ROWS - 1)) / ROWS;
+  const cellH = (100 - PAD_TOP - PAD_BOTTOM - GAP * (ROWS - 1)) / ROWS;
 
   const posX = PAD_X + col * (cellW + GAP) + cellW / 2;
-  const posY =
-    PAD_Y + row * (cellH + GAP) + cellH / 2 + VERTICAL_SHIFT;
+  const posY = PAD_TOP + row * (cellH + GAP) + cellH / 2;
 
   return {
     posX,
