@@ -180,7 +180,12 @@ export default function WallPage() {
         <img
           src="/protocol-logo.png"
           alt="Department of Textiles, Government of Maharashtra"
-          className="wall-logo"
+          className="wall-logo wall-logo-left"
+        />
+        <img
+          src="/bharat-tex-logo.png"
+          alt="Bharat TEX 2026 Global Textile Expo"
+          className="wall-logo wall-logo-right"
         />
         <h1 className="sr-only">Feedback Wall</h1>
       </header>

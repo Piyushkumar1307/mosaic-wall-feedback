@@ -211,16 +211,26 @@ body,
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: clamp(1.1rem, 2.8vh, 1.75rem) 1rem clamp(0.5rem, 1.2vh, 0.85rem);
+  justify-content: space-between;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding: 3px clamp(1rem, 2.5vw, 1.75rem) clamp(0.5rem, 1.2vh, 0.85rem);
 }
 
 .wall-logo {
   display: block;
   width: auto;
-  height: clamp(72px, 13vh, 112px);
-  max-width: min(90vw, 760px);
   object-fit: contain;
+  flex-shrink: 0;
+}
+
+.wall-logo-left {
+  height: clamp(64px, 11vh, 96px);
+  max-width: min(44vw, 400px);
+}
+
+.wall-logo-right {
+  height: clamp(112px, 19vh, 168px);
+  max-width: min(48vw, 360px);
 }
 
 .wall-canvas {
