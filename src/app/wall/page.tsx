@@ -125,6 +125,8 @@ export default function WallPage() {
       source = new EventSource("/api/feedback/stream");
 
       source.onmessage = (event) => {
+        if (!event.data?.trim()) return;
+
         try {
           const data = JSON.parse(event.data) as { items: WallItem[] };
           applyItems(data.items);
@@ -141,7 +143,12 @@ export default function WallPage() {
     };
 
     fetch("/api/feedback")
-      .then((response) => response.json())
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Failed to load feedback");
+        const text = await response.text();
+        if (!text.trim()) return { items: [] as WallItem[] };
+        return JSON.parse(text) as { items: WallItem[] };
+      })
       .then((data: { items: WallItem[] }) =>
         applyItems(data.items, { fromInitialFetch: true }),
       )
@@ -169,7 +176,14 @@ export default function WallPage() {
 
   return (
     <main className="wall-shell">
-      <h1 className="wall-title">Feedback Wall</h1>
+      <header className="wall-header">
+        <img
+          src="/protocol-logo.png"
+          alt="Department of Textiles, Government of Maharashtra"
+          className="wall-logo"
+        />
+        <h1 className="wall-title">Feedback Wall</h1>
+      </header>
       <section className="wall-canvas" aria-label="Floating feedback doodles">
         {visibleItems.map((item) => (
           <WallDoodle
