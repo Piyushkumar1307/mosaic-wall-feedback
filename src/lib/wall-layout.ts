@@ -5,7 +5,7 @@ const ROWS = 6;
 const PAD_X = 3;
 const PAD_TOP = 12;
 const PAD_BOTTOM = 5;
-const GAP = 0.8;
+const GAP = 0;
 
 export type SlotLayout = {
   posX: number;
@@ -41,8 +41,8 @@ export function getSlotLayout(
   return {
     posX,
     posY,
-    slotWidthPct: cellW * 0.98,
-    slotHeightPct: cellH * 0.98,
+    slotWidthPct: cellW,
+    slotHeightPct: cellH,
     rotation: ((slotIndex * 13) % 15) - 7,
     scale: densityScale(safeCount),
   };
