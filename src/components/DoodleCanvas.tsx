@@ -19,6 +19,7 @@ export type DoodleCanvasHandle = {
 
 type DoodleCanvasProps = {
   onDrawingChange?: (hasDrawing: boolean) => void;
+  disabled?: boolean;
 };
 
 function cropCanvasToDataUrl(canvas: HTMLCanvasElement): string | null {
@@ -82,7 +83,7 @@ function getPoint(
 }
 
 const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
-  function DoodleCanvas({ onDrawingChange }, ref) {
+  function DoodleCanvas({ onDrawingChange, disabled = false }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const drawingRef = useRef(false);
@@ -195,6 +196,7 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
       if (!canvas) return;
 
       const onPointerDown = (event: PointerEvent) => {
+        if (disabled) return;
         if (activePointerRef.current !== null) return;
 
         event.preventDefault();
@@ -243,7 +245,7 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
         canvas.removeEventListener("pointerup", onPointerUp);
         canvas.removeEventListener("pointercancel", onPointerCancel);
       };
-    }, [continueStroke, endStroke, startStroke]);
+    }, [continueStroke, disabled, endStroke, startStroke]);
 
     useImperativeHandle(ref, () => ({
       clear: () => {
@@ -268,7 +270,8 @@ const DoodleCanvas = forwardRef<DoodleCanvasHandle, DoodleCanvasProps>(
         <canvas
           ref={canvasRef}
           className="doodle-canvas"
-          aria-label="Draw your feedback with finger or mouse"
+          aria-label="Draw your signature with finger or mouse"
+          aria-disabled={disabled}
         />
       </div>
     );

@@ -3,6 +3,7 @@ import { WALL_SIZE } from "@/lib/constants";
 export type WallItem = {
   slotIndex: number;
   feedbackId: number;
+  name: string;
   imageData: string;
   createdAt: string;
 };
@@ -34,7 +35,10 @@ export function subscribe(listener: WallListener) {
   };
 }
 
-export function submitFeedback(imageData: string): WallItem {
+export function submitFeedback({
+  name,
+  imageData,
+}: Pick<WallItem, "name" | "imageData">): WallItem {
   let slotIndex: number;
 
   if (queue.length >= WALL_SIZE) {
@@ -47,6 +51,7 @@ export function submitFeedback(imageData: string): WallItem {
   const item: WallRecord = {
     slotIndex,
     feedbackId: nextFeedbackId++,
+    name,
     imageData,
     createdAt: new Date().toISOString(),
   };

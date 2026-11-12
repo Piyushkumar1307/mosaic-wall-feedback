@@ -2,16 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSlotLayout } from "@/lib/wall-layout";
-
 type WallItem = {
   slotIndex: number;
   feedbackId: number;
+  name: string;
   imageData: string;
   createdAt: string;
 };
-
-const CENTER_X = 50;
-const CENTER_Y = 50;
 
 function isValidImageData(value: string) {
   return value.startsWith("data:image/");
@@ -36,7 +33,7 @@ function WallDoodle({
 
   return (
     <div
-      className={`wall-slot ${isEntering ? "wall-slot-enter" : ""}`}
+      className={`signature-card ${isEntering ? "signature-card-enter" : ""}`}
       style={{
         left: `${layout.posX}%`,
         top: `${layout.posY}%`,
@@ -44,13 +41,11 @@ function WallDoodle({
         height: `${layout.slotHeightPct}%`,
         ["--final-left" as string]: `${layout.posX}%`,
         ["--final-top" as string]: `${layout.posY}%`,
-        ["--center-left" as string]: `${CENTER_X}%`,
-        ["--center-top" as string]: `${CENTER_Y}%`,
       }}
       onAnimationEnd={(event) => {
         if (
           isEntering &&
-          event.animationName === "wall-linear-enter-slot"
+          event.animationName === "signature-card-enter"
         ) {
           onEnterComplete(item.feedbackId);
         }
@@ -58,17 +53,12 @@ function WallDoodle({
     >
       <img
         src={item.imageData}
-        alt=""
-        className={`wall-doodle ${isEntering ? "" : "wall-doodle-float"}`}
-        style={{
-          ["--rotation" as string]: `${layout.rotation}deg`,
-          ["--scale" as string]: layout.scale,
-          ["--float-duration" as string]: `${7.5 + (item.feedbackId % 4)}s`,
-          ["--float-delay" as string]: `${(item.feedbackId % 6) * 0.25}s`,
-        }}
+        alt={`Signature of ${item.name || "guest"}`}
+        className="signature-card-image"
         draggable={false}
         onError={() => onError(item.feedbackId)}
       />
+      <p className="signature-card-name">{item.name || "Guest"}</p>
     </div>
   );
 }
@@ -178,28 +168,25 @@ export default function WallPage() {
     <main className="wall-shell">
       <header className="wall-header" aria-label="Feedback Wall">
         <img
-          src="/protocol-logo.png"
-          alt="Department of Textiles, Government of Maharashtra"
-          className="wall-logo wall-logo-left"
-        />
-        <img
-          src="/bharat-tex-logo.png"
-          alt="Bharat TEX 2026 Global Textile Expo"
-          className="wall-logo wall-logo-right"
+          src="/arc-logo.png"
+          alt="Arc"
+          className="wall-logo"
         />
         <h1 className="sr-only">Feedback Wall</h1>
       </header>
-      <section className="wall-canvas" aria-label="Floating feedback doodles">
-        {visibleItems.map((item) => (
-          <WallDoodle
-            key={item.feedbackId}
-            item={item}
-            itemCount={itemCount}
-            isEntering={enteringIds.has(item.feedbackId)}
-            onEnterComplete={handleEnterComplete}
-            onError={handleImageError}
-          />
-        ))}
+      <section className="wall-canvas" aria-label="Signed feedback">
+        <div className="signature-card-list">
+          {visibleItems.map((item) => (
+            <WallDoodle
+              key={item.feedbackId}
+              item={item}
+              itemCount={itemCount}
+              isEntering={enteringIds.has(item.feedbackId)}
+              onEnterComplete={handleEnterComplete}
+              onError={handleImageError}
+            />
+          ))}
+        </div>
       </section>
     </main>
   );

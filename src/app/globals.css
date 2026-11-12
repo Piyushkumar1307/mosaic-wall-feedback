@@ -105,6 +105,63 @@ body,
   margin: 0 auto;
 }
 
+.name-field {
+  display: grid;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  margin-bottom: clamp(0.75rem, 1.8vw, 1rem);
+}
+
+.name-field-label,
+.signature-field-heading {
+  color: #e2e8f0;
+  font-size: clamp(0.9rem, 1.7vw, 1rem);
+  font-weight: 700;
+}
+
+.name-input {
+  min-height: var(--touch-min);
+  width: 100%;
+  border: 1px solid #475569;
+  border-radius: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  color: #f8fafc;
+  background: #0f172a;
+  font: inherit;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  outline: none;
+}
+
+.name-input::placeholder {
+  color: #94a3b8;
+}
+
+.name-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(110, 231, 168, 0.18);
+}
+
+.signature-field {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.signature-field-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0 0 0.45rem;
+}
+
+.signature-field-heading small {
+  color: var(--muted);
+  font-size: 0.78em;
+  font-weight: 500;
+}
+
 .doodle-wrap {
   flex: 1;
   min-height: 0;
@@ -125,6 +182,11 @@ body,
   cursor: crosshair;
   display: block;
   background: transparent;
+}
+
+.doodle-canvas[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.42;
 }
 
 .submit-controls {
@@ -211,14 +273,15 @@ body,
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: clamp(0.75rem, 2vw, 1.5rem);
   padding: 3px clamp(0.85rem, 2vw, 1.5rem) clamp(0.4rem, 0.9vh, 0.65rem);
 }
 
 .wall-logo {
   display: block;
-  width: auto;
+  width: clamp(98px, 13vw, 170px);
+  height: clamp(54px, 8vh, 88px);
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -239,6 +302,78 @@ body,
   min-height: 0;
   width: 100%;
   overflow: hidden;
+  padding: clamp(0.4rem, 1vw, 0.75rem);
+}
+
+.signature-card-list {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.signature-card {
+  position: absolute;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  transform: translate(-50%, -50%);
+}
+
+.signature-card-enter {
+  z-index: 10;
+  animation: signature-card-enter 3.5s linear forwards;
+}
+
+.signature-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  object-fit: contain;
+}
+
+.signature-card-name {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: #172033;
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes signature-card-enter {
+  0% {
+    left: 0%;
+    top: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  42% {
+    left: 50%;
+    top: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    left: var(--final-left);
+    top: var(--final-top);
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .wall-slot {

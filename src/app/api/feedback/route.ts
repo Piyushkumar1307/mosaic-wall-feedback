@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getWallItems, submitFeedback } from "@/lib/wall-store";
 
 const MAX_IMAGE_BYTES = 2_000_000;
+const MAX_NAME_LENGTH = 80;
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,21 @@ export async function POST(request: Request) {
     const body = await request.json();
     const imageData =
       typeof body.imageData === "string" ? body.imageData.trim() : "";
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+
+    if (!name) {
+      return NextResponse.json(
+        { error: "Please enter your name before signing" },
+        { status: 400 },
+      );
+    }
+
+    if (name.length > MAX_NAME_LENGTH) {
+      return NextResponse.json(
+        { error: `Name must be ${MAX_NAME_LENGTH} characters or fewer` },
+        { status: 400 },
+      );
+    }
 
     if (!imageData) {
       return NextResponse.json(
@@ -39,7 +55,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const item = submitFeedback(imageData);
+    const item = submitFeedback({ name, imageData });
 
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
