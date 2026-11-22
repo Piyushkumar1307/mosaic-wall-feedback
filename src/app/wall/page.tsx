@@ -112,6 +112,26 @@ export default function WallPage() {
         scale: 2,
         useCORS: true,
         logging: false,
+        onclone: (clonedDocument) => {
+          const clonedArtboard = clonedDocument.querySelector<HTMLElement>(
+            ".wall-artboard",
+          );
+          if (!clonedArtboard) return;
+
+          // Keep the clone at the exact visible wall dimensions.
+          clonedArtboard.style.width = `${artboard.clientWidth}px`;
+          clonedArtboard.style.height = `${artboard.clientHeight}px`;
+          clonedArtboard.style.aspectRatio = "auto";
+
+          // Snap every card to its final grid position for the saved image.
+          for (const card of clonedArtboard.querySelectorAll<HTMLElement>(
+            ".signature-card",
+          )) {
+            card.classList.remove("signature-card-enter");
+            card.style.animation = "none";
+            card.style.transform = "translate(-50%, -50%) scale(1)";
+          }
+        },
       });
 
       canvas.toBlob((blob) => {
@@ -125,7 +145,7 @@ export default function WallPage() {
         link.href = url;
         link.download = `signature-wall-${timestamp}.png`;
         link.click();
-        URL.revokeObjectURL(url);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       }, "image/png");
     } catch {
       // The wall remains usable if a browser blocks an automatic download.
