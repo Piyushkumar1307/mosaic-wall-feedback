@@ -16,12 +16,9 @@ export type SlotLayout = {
   scale: number;
 };
 
-function densityScale(itemCount: number) {
-  if (itemCount <= 6) return 1.24;
-  if (itemCount <= 12) return 1.2;
-  if (itemCount <= 20) return 1.16;
-  if (itemCount <= 26) return 1.12;
-  return 1.08;
+function densityScale(_itemCount: number) {
+  // Each card stays inside its own row to prevent signatures from colliding.
+  return 1;
 }
 
 export function getSlotLayout(
