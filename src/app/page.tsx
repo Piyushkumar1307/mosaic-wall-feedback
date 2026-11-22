@@ -61,18 +61,10 @@ export default function SubmitPage() {
 
   return (
     <main className="submit-shell">
-      <aside className="submit-sidebar">
-        <p className="submit-sidebar-label">Share your feedback</p>
-      </aside>
-
-      <section className="submit-panel">
-        <header className="submit-header">
-          <span className="submit-brand">Feedback Wall</span>
-        </header>
-
+      <section className="submit-panel" aria-label="Sign the wall">
         <form onSubmit={handleSubmit} className="submit-form">
           <label className="name-field">
-            <span className="name-field-label">1. Your name</span>
+            <span className="sr-only">Your name</span>
             <input
               value={name}
               onChange={(event) => {
@@ -91,10 +83,7 @@ export default function SubmitPage() {
           </label>
 
           <div className="signature-field">
-            <div className="signature-field-heading">
-              <span>2. Add your signature</span>
-              {!name.trim() && <small>Enter your name to unlock signing</small>}
-            </div>
+            <span className="sr-only">Draw your signature</span>
             <DoodleCanvas
               ref={canvasRef}
               onDrawingChange={setHasDrawing}
@@ -124,7 +113,7 @@ export default function SubmitPage() {
 
           {status === "sent" && (
             <p className="submit-message success" role="status">
-              Thanks! Your signature is on the wall.
+              Your signature is on the wall.
             </p>
           )}
           {status === "error" && errorMessage && (

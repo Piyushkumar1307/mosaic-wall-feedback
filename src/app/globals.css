@@ -259,56 +259,195 @@ body,
   color: #fca5a5;
 }
 
-/* Wall page — floating doodles */
+/* Signature entry — live controls aligned with the supplied tablet artwork. */
+.submit-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  min-height: 100dvh;
+  height: 100dvh;
+  background: #000;
+}
+
+.submit-panel {
+  grid-column: 1;
+  position: relative;
+  width: min(100vw, calc(100dvh * 1600 / 895));
+  aspect-ratio: 1600 / 895;
+  min-height: 0;
+  padding: 0;
+  background: #000 url("/signature-form-template.jpeg") center / contain no-repeat;
+}
+
+.submit-form {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+}
+
+.name-field {
+  position: absolute;
+  left: 26.25%;
+  top: 34.3%;
+  width: 44.4%;
+  height: 12.7%;
+  display: block;
+  margin: 0;
+}
+
+.name-input {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0.75em 1em;
+  border: 0;
+  border-radius: clamp(0.7rem, 1.9vw, 1.5rem);
+  color: #111827;
+  background: transparent;
+  box-shadow: none;
+  font-size: clamp(1rem, 2.7vw, 2rem);
+  font-weight: 500;
+}
+
+.name-input::placeholder {
+  color: #9ca3af;
+}
+
+.name-input:focus {
+  outline: 3px solid rgba(251, 191, 36, 0.82);
+  outline-offset: -3px;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.signature-field {
+  position: absolute;
+  left: 26.25%;
+  top: 48.85%;
+  width: 69.7%;
+  height: 38.55%;
+  display: block;
+  min-height: 0;
+}
+
+.signature-field .doodle-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: clamp(0.7rem, 1.9vw, 1.5rem);
+  background: transparent;
+  box-shadow: none;
+}
+
+.signature-field .doodle-canvas {
+  border-radius: inherit;
+}
+
+.submit-controls {
+  position: absolute;
+  right: 2.5%;
+  bottom: 3.5%;
+  z-index: 1;
+  margin: 0;
+}
+
+.submit-footer {
+  gap: clamp(0.35rem, 0.9vw, 0.75rem);
+}
+
+.submit-clear-button,
+.submit-button {
+  min-height: clamp(2.35rem, 4.4vw, 3rem);
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: clamp(0.8rem, 1.3vw, 1rem);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.submit-clear-button {
+  border-color: #374151;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.submit-button {
+  color: #17120a;
+  background: #fbbf24;
+}
+
+.submit-message {
+  position: absolute;
+  left: 50%;
+  bottom: 2.3%;
+  z-index: 2;
+  width: max-content;
+  max-width: 80%;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  font-size: clamp(0.75rem, 1.25vw, 1rem);
+  transform: translateX(-50%);
+}
+
+.submit-message.error {
+  color: #fecaca;
+}
+
+@media (max-width: 760px) {
+  .submit-panel {
+    width: 100vw;
+  }
+
+  .submit-controls {
+    right: 1.8%;
+    bottom: 2.2%;
+  }
+
+  .submit-clear-button,
+  .submit-button {
+    min-height: 2rem;
+    padding: 0.42rem 0.7rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Wall page — supplied signature-wall artwork with live transparent signatures */
 .wall-shell {
   min-height: 100dvh;
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  background: radial-gradient(circle at 20% 10%, #ffffff 0%, #f1f5f9 55%, #e2e8f0 100%);
+  background: #000;
   overflow: hidden;
-}
-
-.wall-header {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
-  padding: 3px clamp(0.85rem, 2vw, 1.5rem) clamp(0.4rem, 0.9vh, 0.65rem);
-}
-
-.wall-logo {
-  display: block;
-  width: clamp(98px, 13vw, 170px);
-  height: clamp(54px, 8vh, 88px);
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.wall-logo-left {
-  height: clamp(104px, 15vh, 140px);
-  max-width: min(50vw, 560px);
-}
-
-.wall-logo-right {
-  height: clamp(112px, 16vh, 148px);
-  max-width: min(36vw, 320px);
 }
 
 .wall-canvas {
   position: relative;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  overflow: hidden;
-  padding: clamp(0.4rem, 1vw, 0.75rem);
-}
-
-.signature-card-list {
-  position: relative;
   width: 100%;
   height: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.wall-artboard {
+  position: relative;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  background: #000 url("/signature-wall-template.png") center / contain no-repeat;
+}
+
+/* This precisely matches the open white panel in the supplied artwork. */
+.signature-card-list {
+  position: absolute;
+  left: 7.25%;
+  top: 34.5%;
+  width: 85.5%;
+  height: 54.25%;
 }
 
 .signature-card {
@@ -319,18 +458,51 @@ body,
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 1px solid rgba(251, 146, 60, 0.3);
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  gap: 0.2rem;
+  padding: 0.2rem 0.35rem;
+  background: transparent;
   transform: translate(-50%, -50%);
 }
 
 .signature-card-enter {
   z-index: 10;
-  animation: signature-card-enter 3.5s linear forwards;
+  animation: signature-card-enter 3.5s cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
+}
+
+.signature-card-enter::before,
+.signature-card-enter::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 10px;
+  height: 10px;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.signature-card-enter::before {
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff7b0 0 15%, #f59e0b 19% 28%, transparent 34%);
+  box-shadow:
+    0 -42px 0 -2px #fff7b0,
+    36px -22px 0 -3px #fbbf24,
+    40px 24px 0 -3px #fff7b0,
+    0 45px 0 -3px #f59e0b,
+    -38px 20px 0 -3px #fff7b0,
+    -32px -24px 0 -3px #fbbf24;
+  animation: signature-sparkle 1.4s ease-out both;
+}
+
+.signature-card-enter::after {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(251, 191, 36, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 24px 10px rgba(251, 191, 36, 0.35);
+  animation: signature-magic-ring 1.3s ease-out both;
 }
 
 .signature-card-image {
@@ -340,14 +512,15 @@ body,
   min-height: 0;
   flex: 1;
   object-fit: contain;
+  background: transparent;
 }
 
 .signature-card-name {
   max-width: 100%;
-  margin: 0;
+  margin: 0.05rem 0 0;
   overflow: hidden;
-  color: #172033;
-  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  color: #1f2937;
+  font-size: clamp(0.7rem, 1.15vw, 1rem);
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -357,22 +530,56 @@ body,
 
 @keyframes signature-card-enter {
   0% {
-    left: 0%;
+    left: 50%;
     top: 50%;
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.25) rotate(-12deg);
   }
-  42% {
+  16% {
     left: 50%;
     top: 50%;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1.1) rotate(3deg);
+  }
+  58% {
+    left: 50%;
+    top: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
   }
   100% {
     left: var(--final-left);
     top: var(--final-top);
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes signature-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.6) rotate(100deg);
+  }
+}
+
+@keyframes signature-magic-ring {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.25);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(5);
   }
 }
 

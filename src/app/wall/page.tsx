@@ -1,25 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { WALL_SIZE } from "@/lib/constants";
 import { getSlotLayout } from "@/lib/wall-layout";
+
+const IDLE_REPLAY_DELAY_MS = 10 * 60 * 1000;
+const ENTRY_ANIMATION_MS = 3_500;
+const REPLAY_INTERVAL_MS = ENTRY_ANIMATION_MS + 700;
 type WallItem = {
   slotIndex: number;
-  feedbackId: number;
+  feedbackId: string;
   name: string;
   imageData: string;
   createdAt: string;
 };
 
 function isValidImageData(value: string) {
-  return value.startsWith("data:image/");
+  return (
+    value.startsWith("data:image/") ||
+    value.startsWith("https://res.cloudinary.com/")
+  );
 }
 
 type WallDoodleProps = {
   item: WallItem;
   itemCount: number;
   isEntering: boolean;
-  onEnterComplete: (id: number) => void;
-  onError: (id: number) => void;
+  onEnterComplete: (id: string) => void;
+  onError: (id: string) => void;
 };
 
 function WallDoodle({
@@ -65,12 +73,15 @@ function WallDoodle({
 
 export default function WallPage() {
   const [items, setItems] = useState<WallItem[]>([]);
-  const [enteringIds, setEnteringIds] = useState<Set<number>>(new Set());
-  const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
+  const [enteringIds, setEnteringIds] = useState<Set<string>>(new Set());
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [lastActivityAt, setLastActivityAt] = useState<number | null>(null);
+  const wallArtboardRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<WallItem[]>([]);
   const initialFetchDoneRef = useRef(false);
+  const hasCapturedFullWallRef = useRef(false);
 
-  const handleEnterComplete = useCallback((id: number) => {
+  const handleEnterComplete = useCallback((id: string) => {
     setEnteringIds((current) => {
       if (!current.has(id)) return current;
       const next = new Set(current);
@@ -79,8 +90,43 @@ export default function WallPage() {
     });
   }, []);
 
-  const handleImageError = useCallback((id: number) => {
+  const handleImageError = useCallback((id: string) => {
     setHiddenIds((current) => new Set(current).add(id));
+  }, []);
+
+  const triggerEntrance = useCallback((id: string) => {
+    setEnteringIds((current) => new Set(current).add(id));
+  }, []);
+
+  const downloadFullWallSnapshot = useCallback(async () => {
+    const artboard = wallArtboardRef.current;
+    if (!artboard) return;
+
+    try {
+      const { default: html2canvas } = await import("html2canvas");
+      const canvas = await html2canvas(artboard, {
+        backgroundColor: "#000000",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const timestamp = new Date()
+          .toISOString()
+          .replace(/[:.]/g, "-");
+        link.href = url;
+        link.download = `signature-wall-${timestamp}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    } catch {
+      // The wall remains usable if a browser blocks an automatic download.
+    }
   }, []);
 
   const applyItems = useCallback(
@@ -98,14 +144,58 @@ export default function WallPage() {
       if (options?.fromInitialFetch) {
         // Existing doodles on page load — show without entry animation.
       } else if (addedIds.length > 0 && initialFetchDoneRef.current) {
-        setEnteringIds((current) => new Set([...current, ...addedIds]));
+        for (const id of addedIds) triggerEntrance(id);
       }
 
       itemsRef.current = validItems;
       setItems(validItems);
+
+      if (options?.fromInitialFetch) {
+        const latestSavedAt = Math.max(
+          ...validItems.map((item) => Date.parse(item.createdAt) || 0),
+        );
+        setLastActivityAt(latestSavedAt || Date.now());
+      } else if (addedIds.length > 0) {
+        // A new signature pauses any idle replay for another ten minutes.
+        setLastActivityAt(Date.now());
+      }
     },
-    [],
+    [triggerEntrance],
   );
+
+  useEffect(() => {
+    if (items.length < WALL_SIZE || lastActivityAt === null) return;
+
+    let replayInterval: number | undefined;
+    let replayCursor = 0;
+    const delay = Math.max(
+      0,
+      lastActivityAt + IDLE_REPLAY_DELAY_MS - Date.now(),
+    );
+
+    const startReplay = () => {
+      const replayNext = () => {
+        const wallItems = [...itemsRef.current].sort(
+          (a, b) => a.slotIndex - b.slotIndex,
+        );
+        const item = wallItems[replayCursor % wallItems.length];
+        if (!item) return;
+
+        triggerEntrance(item.feedbackId);
+        replayCursor += 1;
+      };
+
+      replayNext();
+      replayInterval = window.setInterval(replayNext, REPLAY_INTERVAL_MS);
+    };
+
+    const replayTimeout = window.setTimeout(startReplay, delay);
+
+    return () => {
+      window.clearTimeout(replayTimeout);
+      if (replayInterval !== undefined) window.clearInterval(replayInterval);
+    };
+  }, [items.length, lastActivityAt, triggerEntrance]);
 
   useEffect(() => {
     let source: EventSource | null = null;
@@ -164,28 +254,41 @@ export default function WallPage() {
 
   const itemCount = visibleItems.length;
 
+  useEffect(() => {
+    if (itemCount < WALL_SIZE) {
+      hasCapturedFullWallRef.current = false;
+      return;
+    }
+
+    if (hasCapturedFullWallRef.current) return;
+    hasCapturedFullWallRef.current = true;
+
+    // Wait until the signature that completes the wall has reached its slot.
+    const snapshotTimer = window.setTimeout(
+      () => void downloadFullWallSnapshot(),
+      ENTRY_ANIMATION_MS + 200,
+    );
+
+    return () => window.clearTimeout(snapshotTimer);
+  }, [downloadFullWallSnapshot, itemCount]);
+
   return (
     <main className="wall-shell">
-      <header className="wall-header" aria-label="Feedback Wall">
-        <img
-          src="/arc-logo.png"
-          alt="Arc"
-          className="wall-logo"
-        />
-        <h1 className="sr-only">Feedback Wall</h1>
-      </header>
       <section className="wall-canvas" aria-label="Signed feedback">
-        <div className="signature-card-list">
-          {visibleItems.map((item) => (
-            <WallDoodle
-              key={item.feedbackId}
-              item={item}
-              itemCount={itemCount}
-              isEntering={enteringIds.has(item.feedbackId)}
-              onEnterComplete={handleEnterComplete}
-              onError={handleImageError}
-            />
-          ))}
+        <h1 className="sr-only">Signature Wall</h1>
+        <div ref={wallArtboardRef} className="wall-artboard">
+          <div className="signature-card-list">
+            {visibleItems.map((item) => (
+              <WallDoodle
+                key={item.feedbackId}
+                item={item}
+                itemCount={itemCount}
+                isEntering={enteringIds.has(item.feedbackId)}
+                onEnterComplete={handleEnterComplete}
+                onError={handleImageError}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </main>

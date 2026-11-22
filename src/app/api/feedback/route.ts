@@ -7,7 +7,15 @@ const MAX_NAME_LENGTH = 80;
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ items: getWallItems() });
+  try {
+    return NextResponse.json({ items: await getWallItems() });
+  } catch (error) {
+    console.error("Failed to load wall items:", error);
+    return NextResponse.json(
+      { error: "Cloudinary storage is not configured" },
+      { status: 503 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -55,7 +63,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const item = submitFeedback({ name, imageData });
+    const item = await submitFeedback({ name, imageData });
 
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
