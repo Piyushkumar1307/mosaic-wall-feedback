@@ -144,7 +144,23 @@ export default function WallPage() {
             snapshotImage.style.backgroundPosition = "center";
             snapshotImage.style.backgroundRepeat = "no-repeat";
             snapshotImage.style.backgroundSize = "contain";
+            snapshotImage.style.height = "70%";
+            snapshotImage.style.minHeight = "0";
+            snapshotImage.style.flex = "0 0 70%";
             clonedImage.replaceWith(snapshotImage);
+          }
+
+          // Reserve a dedicated, visible text band below each signature.
+          for (const name of clonedArtboard.querySelectorAll<HTMLElement>(
+            ".signature-card-name",
+          )) {
+            name.style.height = "30%";
+            name.style.minHeight = "0";
+            name.style.flex = "0 0 30%";
+            name.style.display = "flex";
+            name.style.alignItems = "center";
+            name.style.justifyContent = "center";
+            name.style.overflow = "visible";
           }
 
           // Snap every card to its final grid position for the saved image.
