@@ -123,6 +123,30 @@ export default function WallPage() {
           clonedArtboard.style.height = `${artboard.clientHeight}px`;
           clonedArtboard.style.aspectRatio = "auto";
 
+          const sourceImages = artboard.querySelectorAll<HTMLImageElement>(
+            ".signature-card-image",
+          );
+          const clonedImages = clonedArtboard.querySelectorAll<HTMLImageElement>(
+            ".signature-card-image",
+          );
+
+          // html2canvas can stretch <img> elements with object-fit in a flex
+          // layout. Background images retain the correct contained proportions.
+          for (const [index, clonedImage] of clonedImages.entries()) {
+            const sourceImage = sourceImages[index];
+            if (!sourceImage) continue;
+
+            const snapshotImage = clonedDocument.createElement("div");
+            snapshotImage.className = clonedImage.className;
+            snapshotImage.style.backgroundImage = `url(${JSON.stringify(
+              sourceImage.currentSrc || sourceImage.src,
+            )})`;
+            snapshotImage.style.backgroundPosition = "center";
+            snapshotImage.style.backgroundRepeat = "no-repeat";
+            snapshotImage.style.backgroundSize = "contain";
+            clonedImage.replaceWith(snapshotImage);
+          }
+
           // Snap every card to its final grid position for the saved image.
           for (const card of clonedArtboard.querySelectorAll<HTMLElement>(
             ".signature-card",
