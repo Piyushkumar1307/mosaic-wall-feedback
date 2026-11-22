@@ -77,10 +77,12 @@ export default function WallPage() {
   const [enteringIds, setEnteringIds] = useState<Set<string>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [lastActivityAt, setLastActivityAt] = useState<number | null>(null);
+  const [fullWallSnapshotKey, setFullWallSnapshotKey] = useState<string | null>(
+    null,
+  );
   const wallArtboardRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<WallItem[]>([]);
   const initialFetchDoneRef = useRef(false);
-  const hasCapturedFullWallRef = useRef(false);
 
   const handleEnterComplete = useCallback((id: string) => {
     setEnteringIds((current) => {
@@ -156,9 +158,18 @@ export default function WallPage() {
           ...validItems.map((item) => Date.parse(item.createdAt) || 0),
         );
         setLastActivityAt(latestSavedAt || Date.now());
+        if (validItems.length >= WALL_SIZE) {
+          setFullWallSnapshotKey(
+            validItems.map((item) => item.feedbackId).join(","),
+          );
+        }
       } else if (addedIds.length > 0) {
         // A new signature pauses any idle replay for another ten minutes.
         setLastActivityAt(Date.now());
+        if (validItems.length >= WALL_SIZE) {
+          // Every replacement creates a new full-wall snapshot.
+          setFullWallSnapshotKey(addedIds.join(","));
+        }
       }
     },
     [triggerEntrance],
@@ -256,22 +267,16 @@ export default function WallPage() {
   const itemCount = visibleItems.length;
 
   useEffect(() => {
-    if (itemCount < WALL_SIZE) {
-      hasCapturedFullWallRef.current = false;
-      return;
-    }
+    if (itemCount < WALL_SIZE || !fullWallSnapshotKey) return;
 
-    if (hasCapturedFullWallRef.current) return;
-    hasCapturedFullWallRef.current = true;
-
-    // Wait until the signature that completes the wall has reached its slot.
+    // Wait until the signature that fills or replaces a full wall has settled.
     const snapshotTimer = window.setTimeout(
       () => void downloadFullWallSnapshot(),
       ENTRY_ANIMATION_MS + 200,
     );
 
     return () => window.clearTimeout(snapshotTimer);
-  }, [downloadFullWallSnapshot, itemCount]);
+  }, [downloadFullWallSnapshot, fullWallSnapshotKey, itemCount]);
 
   return (
     <main className="wall-shell">
