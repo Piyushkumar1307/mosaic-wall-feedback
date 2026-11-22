@@ -272,21 +272,24 @@ body,
 .submit-panel {
   grid-column: 1;
   position: relative;
-  width: min(100vw, calc(100dvh * 1600 / 895));
-  aspect-ratio: 1600 / 895;
-  min-height: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
   padding: 0;
-  background: #000 url("/signature-form-template.jpeg") center / contain no-repeat;
+  background: #000 url("/signature-form-template.jpeg") center / cover no-repeat;
 }
 
 .submit-form {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
   display: block;
-  width: 100%;
+  width: max(100vw, 178.771dvh);
+  height: max(100dvh, 55.9375vw);
   max-width: none;
   min-height: 0;
   margin: 0;
+  transform: translate(-50%, -50%);
 }
 
 .name-field {
