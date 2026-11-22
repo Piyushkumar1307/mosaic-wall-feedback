@@ -8,7 +8,7 @@ import {
   useRef,
 } from "react";
 
-const STROKE_COLOR = "#15803d";
+const STROKE_COLOR = "#000000";
 const STROKE_WIDTH = 6;
 
 export type DoodleCanvasHandle = {
