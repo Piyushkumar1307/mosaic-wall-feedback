@@ -459,17 +459,18 @@ body,
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.2rem;
-  padding: 0.2rem 0.35rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0 0.15rem;
   background: transparent;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(var(--card-scale, 1));
+  transform-origin: center;
 }
 
 .signature-card-enter {
   z-index: 10;
-  animation: signature-card-enter 3.5s cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
+  animation: signature-card-enter 2s cubic-bezier(0.18, 0.82, 0.25, 1) forwards;
 }
 
 .signature-card-enter::before,
@@ -478,8 +479,8 @@ body,
   top: 50%;
   left: 50%;
   z-index: -1;
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   content: "";
   opacity: 0;
   pointer-events: none;
@@ -488,24 +489,39 @@ body,
 
 .signature-card-enter::before {
   border-radius: 50%;
-  background: radial-gradient(circle, #fff7b0 0 15%, #f59e0b 19% 28%, transparent 34%);
+  background: radial-gradient(circle, #fff 0 12%, #fef3c7 16% 28%, transparent 34%);
   box-shadow:
-    0 -42px 0 -2px #fff7b0,
-    36px -22px 0 -3px #fbbf24,
-    40px 24px 0 -3px #fff7b0,
-    0 45px 0 -3px #f59e0b,
-    -38px 20px 0 -3px #fff7b0,
-    -32px -24px 0 -3px #fbbf24;
-  animation: signature-sparkle 1.4s ease-out both;
+    0 -58px 0 -3px #fff7b0,
+    40px -42px 0 -4px #e9d5ff,
+    62px -5px 0 -3px #fbbf24,
+    46px 40px 0 -4px #f5d0fe,
+    0 62px 0 -3px #fff7b0,
+    -44px 42px 0 -4px #e9d5ff,
+    -62px 0 0 -3px #fbbf24,
+    -42px -42px 0 -4px #f5d0fe;
+  filter: drop-shadow(0 0 7px rgba(255, 236, 153, 0.92));
+  animation: signature-stardust 2s ease-out both;
 }
 
 .signature-card-enter::after {
-  width: 28px;
-  height: 28px;
-  border: 2px solid rgba(251, 191, 36, 0.8);
+  width: 48px;
+  height: 48px;
+  border: 0;
   border-radius: 50%;
-  box-shadow: 0 0 24px 10px rgba(251, 191, 36, 0.35);
-  animation: signature-magic-ring 1.3s ease-out both;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0 12%,
+    #fef3c7 17%,
+    #c084fc 30%,
+    transparent 43% 55%,
+    #fbbf24 68%,
+    #f5d0fe 80%,
+    transparent 92%
+  );
+  box-shadow: 0 0 28px 10px rgba(192, 132, 252, 0.35);
+  -webkit-mask: radial-gradient(transparent 55%, #000 58%);
+  mask: radial-gradient(transparent 55%, #000 58%);
+  animation: signature-fantasy-portal 2s ease-out both;
 }
 
 .signature-card-image {
@@ -520,13 +536,14 @@ body,
 
 .signature-card-name {
   max-width: 100%;
-  margin: 0.05rem 0 0;
+  margin: 0;
   overflow: hidden;
   color: #1f2937;
   font-size: clamp(0.7rem, 1.15vw, 1rem);
   font-weight: 700;
   line-height: 1.2;
-  text-align: center;
+  padding-left: 0.15rem;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -536,53 +553,61 @@ body,
     left: 50%;
     top: 50%;
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.25) rotate(-12deg);
+    transform: translate(-50%, -50%) scale(0.16) rotate(-16deg);
   }
-  16% {
+  18% {
     left: 50%;
     top: 50%;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.1) rotate(3deg);
+    transform: translate(-50%, -50%) scale(1.28) rotate(7deg);
   }
-  58% {
+  46% {
     left: 50%;
     top: 50%;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    transform: translate(-50%, -50%) scale(0.96) rotate(-2deg);
   }
   100% {
     left: var(--final-left);
     top: var(--final-top);
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    transform: translate(-50%, -50%) scale(var(--card-scale, 1)) rotate(0deg);
   }
 }
 
-@keyframes signature-sparkle {
+@keyframes signature-stardust {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
-  }
-  20% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(2.6) rotate(100deg);
-  }
-}
-
-@keyframes signature-magic-ring {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.25);
+    transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
   }
   18% {
     opacity: 1;
   }
+  48% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.5) rotate(110deg);
+  }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(5);
+    transform: translate(-50%, -50%) scale(3.5) rotate(240deg);
+  }
+}
+
+@keyframes signature-fantasy-portal {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.1) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(3.5) rotate(250deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(6) rotate(540deg);
   }
 }
 

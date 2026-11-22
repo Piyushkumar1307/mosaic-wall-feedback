@@ -2,9 +2,9 @@ import { WALL_SIZE } from "@/lib/constants";
 
 const COLS = 5;
 const ROWS = 6;
-const PAD_X = 3;
-const PAD_TOP = 12;
-const PAD_BOTTOM = 5;
+const PAD_X = 1.75;
+const PAD_TOP = 8;
+const PAD_BOTTOM = 2;
 const GAP = 0;
 
 export type SlotLayout = {
@@ -17,11 +17,11 @@ export type SlotLayout = {
 };
 
 function densityScale(itemCount: number) {
-  if (itemCount <= 6) return 1.2;
-  if (itemCount <= 12) return 1.1;
-  if (itemCount <= 20) return 1;
-  if (itemCount <= 26) return 0.92;
-  return 0.85;
+  if (itemCount <= 6) return 1.24;
+  if (itemCount <= 12) return 1.2;
+  if (itemCount <= 20) return 1.16;
+  if (itemCount <= 26) return 1.12;
+  return 1.08;
 }
 
 export function getSlotLayout(

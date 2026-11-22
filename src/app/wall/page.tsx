@@ -5,8 +5,8 @@ import { WALL_SIZE } from "@/lib/constants";
 import { getSlotLayout } from "@/lib/wall-layout";
 
 const IDLE_REPLAY_DELAY_MS = 10 * 60 * 1000;
-const ENTRY_ANIMATION_MS = 3_500;
-const REPLAY_INTERVAL_MS = ENTRY_ANIMATION_MS + 700;
+const ENTRY_ANIMATION_MS = 2_000;
+const REPLAY_INTERVAL_MS = ENTRY_ANIMATION_MS + 450;
 type WallItem = {
   slotIndex: number;
   feedbackId: string;
@@ -49,6 +49,7 @@ function WallDoodle({
         height: `${layout.slotHeightPct}%`,
         ["--final-left" as string]: `${layout.posX}%`,
         ["--final-top" as string]: `${layout.posY}%`,
+        ["--card-scale" as string]: layout.scale,
       }}
       onAnimationEnd={(event) => {
         if (
